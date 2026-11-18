@@ -1,0 +1,6 @@
+{
+  "appId":"com.nexie.library",
+  "appName":"N·EXIE LIBRARY",
+  "webDir":"dist",
+  "server":{"androidScheme":"https"}
+}
