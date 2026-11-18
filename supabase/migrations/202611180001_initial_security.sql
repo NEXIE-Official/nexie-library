@@ -82,6 +82,13 @@ alter table public.work_comments enable row level security;
 alter table public.direct_messages enable row level security;
 alter table public.support_tickets enable row level security;
 
+-- Column-level grants prevent users from escalating their own role/team.
+revoke update on public.profiles from authenticated;
+grant update(full_name) on public.profiles to authenticated;
+-- Recipients may acknowledge a message but cannot rewrite its sender or content.
+revoke update on public.direct_messages from authenticated;
+grant update(read_at) on public.direct_messages to authenticated;
+
 create policy "profiles visible to authenticated colleagues" on public.profiles
  for select to authenticated using (is_active=true);
 create policy "profile self update limited by column grants" on public.profiles
