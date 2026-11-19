@@ -46,6 +46,7 @@ let directory=[];
 let teamRecords=[];
 let teamMembers=[];
 let ticketRecords=[];
+let realtimeChannel=null;
 let active='overview', search='', filter='Todos', current=null, profile=null, chatOpen=false;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -126,9 +127,26 @@ function forcePasswordChange(){
     if(completeError){$('#passwordError').textContent='Password changed, but the first-access confirmation failed. Please contact the administrator.';button.disabled=false;return;}
     profile={...profile,must_change_password:false};
     await loadWorkspaceData();
+    startRealtimeNotifications();
     modal.remove();
     render();
   };
+}
+function startRealtimeNotifications(){
+  if(realtimeChannel) supabase.removeChannel(realtimeChannel);
+  if(!profile) return;
+  realtimeChannel=supabase.channel('nexie-ticket-notifications-'+profile.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_tickets',filter:'assigned_to=eq.'+profile.id},async payload=>{
+      await loadWorkspaceData();
+      alert('A new support ticket has been assigned to you.');
+    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'ticket_messages'},async payload=>{
+      if(payload.new.sender_id!==profile.id){
+        await loadWorkspaceData();
+        alert('There is a new reply in one of your support tickets.');
+      }
+    })
+    .subscribe();
 }
 async function loadWorkspaceData(){
   const {data:teamRows}=await supabase.from('teams').select('*').order('name');
@@ -156,11 +174,12 @@ async function restoreAuthentication(){
   profile=record;current=record.full_name;
   await loadWorkspaceData();
   if(record.must_change_password){forcePasswordChange();return;}
+  startRealtimeNotifications();
   render();
 }
 document.querySelector('#app').innerHTML=shell();render();
 $('#helpBtn')?.addEventListener('click',()=>{active='support';render()});
-$('#switchUser')?.addEventListener('click',async()=>{await supabase.auth.signOut();profile=null;current=null;accountDialog()});
+$('#switchUser')?.addEventListener('click',async()=>{await supabase.auth.signOut();if(realtimeChannel)supabase.removeChannel(realtimeChannel);realtimeChannel=null;profile=null;current=null;accountDialog()});
 restoreAuthentication();
 supabase.auth.onAuthStateChange((event,session)=>{
   if(event==='SIGNED_OUT'&&!session){profile=null;current=null;if(!document.querySelector('.login-screen'))accountDialog();}
