@@ -13,23 +13,23 @@ using ((select private.is_active_employee()));
 drop policy if exists "active employees read employee badge photos" on storage.objects;
 create policy "active employees read employee badge photos"
 on storage.objects for select to authenticated
-using (bucket_id = 'nexie-library-assets' and (storage.foldername(name))[1] = 'employee-badges' and (select private.is_active_employee()));
+using (bucket_id = 'nexie-library-assets' and (storage.foldername(name))[2] = 'employee-badges' and (select private.is_active_employee()));
 
 drop policy if exists "primary admin uploads employee badge photos" on storage.objects;
 create policy "primary admin uploads employee badge photos"
 on storage.objects for insert to authenticated
-with check (bucket_id = 'nexie-library-assets' and (storage.foldername(name))[1] = 'employee-badges' and (select private.is_primary_admin()));
+with check (bucket_id = 'nexie-library-assets' and (storage.foldername(name))[2] = 'employee-badges' and (select private.is_primary_admin()));
 
 drop policy if exists "primary admin updates employee badge photos" on storage.objects;
 create policy "primary admin updates employee badge photos"
 on storage.objects for update to authenticated
-using (bucket_id = 'nexie-library-assets' and (storage.foldername(name))[1] = 'employee-badges' and (select private.is_primary_admin()))
-with check (bucket_id = 'nexie-library-assets' and (storage.foldername(name))[1] = 'employee-badges' and (select private.is_primary_admin()));
+using (bucket_id = 'nexie-library-assets' and (storage.foldername(name))[2] = 'employee-badges' and (select private.is_primary_admin()))
+with check (bucket_id = 'nexie-library-assets' and (storage.foldername(name))[2] = 'employee-badges' and (select private.is_primary_admin()));
 
 drop policy if exists "primary admin deletes employee badge photos" on storage.objects;
 create policy "primary admin deletes employee badge photos"
 on storage.objects for delete to authenticated
-using (bucket_id = 'nexie-library-assets' and (storage.foldername(name))[1] = 'employee-badges' and (select private.is_primary_admin()));
+using (bucket_id = 'nexie-library-assets' and (storage.foldername(name))[2] = 'employee-badges' and (select private.is_primary_admin()));
 
 grant update (avatar_path) on public.employee_profiles to authenticated;
 
