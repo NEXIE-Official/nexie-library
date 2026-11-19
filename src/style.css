@@ -59,3 +59,23 @@
 .asset-file small{font-size:8px;color:#888;white-space:nowrap}
 
 .chat-float{display:grid;place-items:center}.chat-float svg{width:22px;height:22px;display:block}
+
+
+.team-roster-list{display:grid;gap:18px;margin:20px 0}
+.team-roster-card{border:1px solid #e8e8e8;padding:18px;margin:18px 0;background:#fff}
+.team-roster-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:1px solid #eee;padding-bottom:13px;margin-bottom:14px}
+.team-roster-heading h2{font:600 18px Manrope;margin:7px 0}
+.team-roster-heading p{font-size:10px;color:#777;margin:0}
+.team-count{font-size:9px;color:#666;white-space:nowrap;padding:6px 9px;background:#f6f6f6}
+.team-roster-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.team-person{border:1px solid #eee;padding:10px;min-width:0}
+.team-person-identity{display:flex;align-items:center;gap:11px;min-width:0}
+.team-person-photo{width:54px;height:64px;object-fit:cover;flex-shrink:0;border:1px solid #e5e5e5;background:#f6f6f6}
+.team-person-placeholder{display:grid;place-items:center;font:600 14px Manrope;color:#888}
+.team-person-identity b{display:block;font-size:10px;line-height:1.45}
+.team-person-identity small{display:block;font-size:9px;color:#777;line-height:1.45;margin-top:4px}
+.badge-photo-admin-list{display:grid;gap:10px}
+.badge-photo-admin-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,1fr) auto;align-items:center;gap:12px;border:1px solid #eee;padding:10px}
+.badge-upload-label{display:grid;gap:6px;font-size:8px;color:#666}
+.badge-upload-label input{font-size:9px;max-width:100%}
+@media(max-width:650px){.team-roster-grid{grid-template-columns:1fr}.badge-photo-admin-row{grid-template-columns:1fr}.team-person-photo{width:48px;height:58px}.team-roster-card{padding:13px}}
