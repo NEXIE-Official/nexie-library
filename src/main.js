@@ -169,6 +169,10 @@ function startRealtimeNotifications(){
   if(realtimeChannel) supabase.removeChannel(realtimeChannel);
   if(!profile) return;
   realtimeChannel=supabase.channel('nexie-ticket-notifications-'+profile.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'tasks',filter:'assignee_id=eq.'+profile.id},async payload=>{
+      await loadWorkspaceData();
+      alert('A new project task has been assigned to you.');
+    })
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_tickets',filter:'assigned_to=eq.'+profile.id},async payload=>{
       await loadWorkspaceData();
       alert('A new support ticket has been assigned to you.');
