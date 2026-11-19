@@ -107,6 +107,7 @@ function accountDialog(){
     await loadWorkspaceData();
     modal.remove();
     if(record.must_change_password){ forcePasswordChange(); return; }
+    startRealtimeNotifications();
     render();
   };
 }
