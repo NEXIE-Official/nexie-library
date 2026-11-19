@@ -1,5 +1,0 @@
--- Retired draft: this migration was never applied to the hosted project.
--- Its role-based authorization trusted profile-controlled role values and included
--- SECURITY DEFINER helpers in the exposed public schema. Do not apply it.
--- The reviewed schema is maintained in 202611190001_admin_registry.sql and
--- 202611190002_core_workspace_schema.sql.
