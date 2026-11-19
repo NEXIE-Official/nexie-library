@@ -57,3 +57,5 @@
 .asset-file span{font-size:15px;color:#777}
 .asset-file b{font-size:9px;font-weight:500;flex:1;overflow-wrap:anywhere}
 .asset-file small{font-size:8px;color:#888;white-space:nowrap}
+
+.chat-float{display:grid;place-items:center}.chat-float svg{width:22px;height:22px;display:block}
