@@ -1,4 +1,5 @@
 import './style.css';
+import { supabase } from './supabase.js';
 
 const people = [
 ['Andressa Correia','Artistic Director','Creative Direction'],['Kim Min-jae','Producing Director','Production'],['Park Ji-eu','Associate Creative Director ZHYT SONG','Creative Direction'],['Yoon Su-ah','Beauty & Image Director','Image & Styling'],['Yoon Su-ho','Head Producer','Production'],['Lucca Kingsley','Choreographer','Performance'],['Lĩ Xiāopéng','Producer','Production'],['Scarlett Hayes','Brand Development and Concepts','Brand & Marketing'],['Keeva Novak','Fashion & Styling Director ZHYT SONG','Image & Styling'],['LEE SEUNG-WON','CEO N·EXIE','Executive'],['Go Eun-ah','CHRO','People & Culture'],['Shin Ah-in','CSO','Executive'],['Cha Min-seo','CLO','Legal'],['Han Ji-sub','CFO','Finance'],['Lee Do-hyun','CTO','Technology'],['ARTHUR VEGA','Tech Lead / Engineering Manager N·EXIE','Technology'],['ISABELLA MENDOZA','UI/UX Developer N·EXIE','Technology'],['EDUARDA BARROSO','Frontend Developer N·EXIE','Technology'],['JOSHUA THORNE','Security Engineer N·EXIE','Technology'],['EUN-WOO','Frontend Developer N·EXIE','Technology'],['KAELEN','Backend Developer','Technology'],['Kang Seo-jin','CEO','Executive'],['Lim Min-seo','Head of A&R','Artist Operations'],['Maizie Alarcón','Head of Artist Operations','Artist Operations'],['Cho Eun-ji','Head of Marketing','Brand & Marketing'],['Seo Jin-woo','Head of PR','Brand & Marketing'],['Lee Juhye','Chief Creative Director','Creative Direction'],['Jung Sung-min','CEO — Gatherverse','Gatherverse'],['Chen Ziyi','CTO — Gatherverse','Gatherverse'],['Min-jun Kwak','Head of Platform — Gatherverse','Gatherverse'],['Kwon Eun-seon','CPO — Gatherverse','Gatherverse'],['Park Hyeon-woo','Head of Business Development — Gatherverse','Gatherverse'],['Aoi Sato','Head of Community & Social — Gatherverse','Gatherverse'],['Park Si-won','Head of Operations — Gatherverse','Gatherverse']
@@ -13,11 +14,11 @@ let tasks=read('tasks',[
 {id:3,title:'Planejamento de conteúdo',artist:'A.X.S.',team:'Brand & Marketing',assignee:'Cho Eun-ji',createdBy:'Cho Eun-ji',status:'A fazer',priority:'Normal',due:'2026-12-02',description:'Calendário de publicação e campanha.'}
 ]);
 let messages=read('messages',[]);
-let active='overview', search='', filter='Todos', current=read('currentUser',null), chatOpen=false;
+let active='overview', search='', filter='Todos', current=null, profile=null, chatOpen=false;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const initials=s=>String(s||'NX').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
-const me=()=>people.find(p=>p[0]===current)||people[0];
+const me=()=>profile?[profile.full_name,profile.job_title,profile.department]:people.find(p=>p[0]===current)||people[0];
 const canSee=t=>!current||t.assignee===current||t.createdBy===current||t.team===me()[2]||me()[2]==='Executive';
 const visibleTasks=()=>tasks.filter(canSee);
 const logo='<img class="brand-logo" src="/nexie-logo.svg" alt="N·EXIE LIBRARY">';
@@ -32,5 +33,73 @@ function chatPage(){let mine=messages.filter(m=>m.from===current||m.to===current
 function supportPage(){return `<div class="page-title"><div class="eyebrow">N·EXIE IT SERVICE DESK</div><h1>Suporte TI</h1><p>Abra um chamado com a equipe de tecnologia e segurança.</p></div><div class="support-card"><div class="support-icon">✳</div><h2>Como podemos ajudar?</h2><p>Registre o problema com detalhes para facilitar a triagem. Nesta versão de demonstração, o envio é preparado por e-mail.</p><form id="supportForm"><label>ASSUNTO<input name="subject" required placeholder="Ex.: Acesso ao workspace"></label><label>CATEGORIA<select name="type"><option>Problema técnico</option><option>Acesso e permissões</option><option>Solicitação de melhoria</option><option>Segurança / incidente</option></select></label><label>DESCRIÇÃO<textarea name="message" required rows="5" placeholder="O que aconteceu? Quando começou? Qual o impacto?"></textarea></label><button class="primary">Preparar chamado ↗</button></form><small class="note">Destino: nexie.development@outlook.com · O envio depende do aplicativo de e-mail.</small></div>`;}
 function taskDialog(id){let t=tasks.find(x=>x.id===id)||{};const modal=document.createElement('div');modal.className='modal-back';modal.innerHTML=`<form class="modal" id="editTask"><button type="button" class="close" id="close">×</button><div class="eyebrow">TASK DETAIL</div><h2>${esc(t.title)}</h2><p>Responsável: ${esc(t.assignee)} · Criado por: ${esc(t.createdBy||'—')}</p><label>STATUS<select name="status">${['A fazer','Em andamento','Em revisão','Concluído'].map(x=>`<option ${t.status===x?'selected':''}>${x}</option>`).join('')}</select></label><label>OBSERVAÇÕES / DEVOLUTIVA<textarea name="description" rows="5">${esc(t.description||'')}</textarea></label><div class="modal-actions"><button class="primary">Salvar atualização</button></div></form>`;document.body.append(modal);$('#close').onclick=()=>modal.remove();$('#editTask').onsubmit=e=>{e.preventDefault();let d=Object.fromEntries(new FormData(e.target));tasks=tasks.map(x=>x.id===id?{...x,...d}:x);save('tasks',tasks);modal.remove();render();};}
 function render(){const c=$('#content');const pages={overview,tasks:tasksPage,newfile:newFile,artists:artistsPage,people:peoplePage,chat:chatPage,support:supportPage};c.innerHTML=pages[active]();document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{active=b.dataset.page;search='';render()});const s=$('#search');if(s)s.oninput=e=>{search=e.target.value;const pos=s.selectionStart;render();$('#search').focus();$('#search').setSelectionRange(pos,pos)};const f=$('#filter');if(f)f.onchange=e=>{filter=e.target.value;render()};document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>taskDialog(Number(b.dataset.edit)));const tf=$('#taskForm');if(tf)tf.onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(tf));tasks.unshift({id:Date.now(),...d,createdBy:current||'Workspace',status:'A fazer'});save('tasks',tasks);active='tasks';render()};const sf=$('#supportForm');if(sf)sf.onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(sf));location.href='mailto:nexie.development@outlook.com?subject='+encodeURIComponent('[N·EXIE TI] '+d.subject)+'&body='+encodeURIComponent('Solicitante: '+(current||'Não identificado')+'\nCategoria: '+d.type+'\n\n'+d.message)};const cf=$('#chatForm');if(cf)cf.onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(cf));messages.push({...d,from:current||'Workspace',at:new Date().toISOString()});save('messages',messages);render()};}
-function accountDialog(){const modal=document.createElement('div');modal.className='login-screen';modal.innerHTML=`<div class="login-photo"><div class="photo-brand">N·EXIE<br><span>LIBRARY</span></div><div class="photo-bottom">Secure. Organize. Create.<br>All N·EXIE assets, in one place.</div></div><div class="login-panel"><div class="language">KR⌄</div><div class="login-form"><div class="login-mark">N·EXIE <span>LIBRARY</span></div><h1>Welcome to N·EXIE LIBRARY</h1><p>N·EXIE 직원 전용 시스템입니다.<br>Staff Only</p><form id="accountForm"><label>Email address<input name="email" type="email" required placeholder="Email address"></label><label>Password<input name="password" type="password" required placeholder="Password"></label><div class="login-options"><label><input type="checkbox"> Keep me logged in</label><a href="mailto:nexie.development@outlook.com">Forgot your password?</a></div><button class="login-submit">Login</button><div class="or-line">OR</div><button type="button" class="sso-button" id="ssoPreview">♙ &nbsp; SSO Login (N·EXIE Account)</button><div class="login-help">Help Center&nbsp; | &nbsp;Contact IT Support</div><details class="preview-access"><summary>Preview access (demo only)</summary><select id="previewUser">${people.map(p=>`<option value="${esc(p[0])}" ${p[0]===current?'selected':''}>${esc(p[0])} — ${esc(p[1])}</option>`).join('')}</select></details></form></div><footer>© N·EXIE Co., Ltd. All rights reserved.</footer></div>`;document.body.append(modal);const enter=(user)=>{current=user;save('currentUser',current);modal.remove();render();};$('#accountForm').onsubmit=e=>{e.preventDefault();enter($('#previewUser')?.value||current||people[0][0]);};$('#ssoPreview').onclick=()=>enter($('#previewUser')?.value||current||people[0][0]);}
-document.querySelector('#app').innerHTML=shell();render();$('#helpBtn').onclick=()=>{active='support';render()};$('#switchUser').onclick=accountDialog;if(!current)accountDialog();
+function accountDialog(){
+  if(document.querySelector('.login-screen')) return;
+  const modal=document.createElement('div');
+  modal.className='login-screen';
+  modal.innerHTML=`<div class="login-photo"><div class="photo-brand">N·EXIE<br><span>LIBRARY</span></div><div class="photo-bottom">Secure. Organize. Create.<br>All N·EXIE assets, in one place.</div></div><div class="login-panel"><div class="login-form"><div class="login-mark">N·EXIE <span>LIBRARY</span></div><h1>Welcome to N·EXIE LIBRARY</h1><p>Secure employee access.<br>Staff Only</p><form id="accountForm"><label>Email address<input name="email" type="email" autocomplete="username" required placeholder="Work email address"></label><label>Password<input name="password" type="password" autocomplete="current-password" required placeholder="Password"></label><button class="login-submit">Login</button><p id="loginError" role="alert" style="color:#a22;min-height:18px"></p><div class="login-help">Need access? Contact the primary administrator.</div></form></div><footer>© N·EXIE Co., Ltd. All rights reserved.</footer></div>`;
+  document.body.append(modal);
+  $('#accountForm').onsubmit=async e=>{
+    e.preventDefault();
+    const button=e.submitter;
+    button.disabled=true;
+    $('#loginError').textContent='Authenticating…';
+    const data=Object.fromEntries(new FormData(e.target));
+    const {data:authData,error}=await supabase.auth.signInWithPassword({email:data.email,password:data.password});
+    if(error||!authData.user){
+      $('#loginError').textContent='Unable to sign in. Check your credentials or contact the administrator.';
+      button.disabled=false;
+      return;
+    }
+    const {data:record,error:profileError}=await supabase.from('employee_profiles').select('*').eq('id',authData.user.id).maybeSingle();
+    if(profileError||!record||record.account_status!=='active'){
+      await supabase.auth.signOut();
+      $('#loginError').textContent='This account is not active. Contact the primary administrator.';
+      button.disabled=false;
+      return;
+    }
+    profile=record;
+    current=record.full_name;
+    modal.remove();
+    if(record.must_change_password){ forcePasswordChange(); return; }
+    render();
+  };
+}
+function forcePasswordChange(){
+  const modal=document.createElement('div');
+  modal.className='modal-back';
+  modal.innerHTML=`<form class="modal" id="firstPasswordForm"><div class="eyebrow">ACCOUNT SECURITY / FIRST ACCESS</div><h2>Set your personal password</h2><p>For security, you must replace the initial password before entering the workspace. Use at least 12 characters.</p><label>New password<input name="password" type="password" minlength="12" autocomplete="new-password" required></label><label>Confirm new password<input name="confirm" type="password" minlength="12" autocomplete="new-password" required></label><p id="passwordError" role="alert" style="color:#a22;min-height:18px"></p><div class="modal-actions"><button class="primary">Save new password</button></div></form>`;
+  document.body.append(modal);
+  $('#firstPasswordForm').onsubmit=async e=>{
+    e.preventDefault();
+    const data=Object.fromEntries(new FormData(e.target));
+    if(data.password.length<12){$('#passwordError').textContent='Use at least 12 characters.';return;}
+    if(data.password!==data.confirm){$('#passwordError').textContent='The passwords do not match.';return;}
+    const button=e.submitter;button.disabled=true;
+    const {error}=await supabase.auth.updateUser({password:data.password});
+    if(error){$('#passwordError').textContent=error.message;button.disabled=false;return;}
+    const {error:completeError}=await supabase.rpc('complete_first_login_password_change');
+    if(completeError){$('#passwordError').textContent='Password changed, but the first-access confirmation failed. Please contact the administrator.';button.disabled=false;return;}
+    profile={...profile,must_change_password:false};
+    modal.remove();
+    render();
+  };
+}
+async function restoreAuthentication(){
+  const {data,error}=await supabase.auth.getSession();
+  if(error||!data.session){accountDialog();return;}
+  const {data:record,error:profileError}=await supabase.from('employee_profiles').select('*').eq('id',data.session.user.id).maybeSingle();
+  if(profileError||!record||record.account_status!=='active'){
+    await supabase.auth.signOut();accountDialog();return;
+  }
+  profile=record;current=record.full_name;
+  if(record.must_change_password){forcePasswordChange();return;}
+  render();
+}
+document.querySelector('#app').innerHTML=shell();render();
+$('#helpBtn')?.addEventListener('click',()=>{active='support';render()});
+$('#switchUser')?.addEventListener('click',async()=>{await supabase.auth.signOut();profile=null;current=null;accountDialog()});
+restoreAuthentication();
+supabase.auth.onAuthStateChange((event,session)=>{
+  if(event==='SIGNED_OUT'&&!session){profile=null;current=null;if(!document.querySelector('.login-screen'))accountDialog();}
+});
