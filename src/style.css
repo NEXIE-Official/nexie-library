@@ -29,3 +29,13 @@
 .ticket-message small{font-size:8px;color:#999}
 .ticket-message.mine{text-align:right}
 .ticket-modal form{display:grid;gap:12px}
+
+.employee-admin-list{display:grid;gap:12px}
+.employee-admin-card{border:1px solid #eee;padding:15px;display:grid;gap:12px}
+.employee-admin-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.employee-admin-head b{display:block;font-size:11px}
+.employee-admin-head small{display:block;font-size:9px;color:#888;margin-top:4px}
+.employee-admin-card label{display:grid;gap:6px;font-size:8px;color:#555}
+.employee-admin-card input,.employee-admin-card select{width:100%;border:1px solid #e2e2e2;padding:9px;font-size:10px;background:#fff}
+.employee-admin-actions{display:flex;gap:15px;align-items:center;flex-wrap:wrap}
+@media(max-width:650px){.employee-admin-card .two{grid-template-columns:1fr}}
