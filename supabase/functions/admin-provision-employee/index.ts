@@ -94,7 +94,7 @@ Deno.serve(async (req: Request) => {
     job_title: jobTitle,
     department,
     account_status: "active",
-    must_change_password: true,
+    must_change_password: false,
   });
 
   if (insertError) {
@@ -114,7 +114,7 @@ Deno.serve(async (req: Request) => {
     user_id: userId,
     email,
     account_status: "active",
-    must_change_password: true,
+    must_change_password: false,
     message: "Account created. Deliver the initial password through a private channel.",
   });
 });
