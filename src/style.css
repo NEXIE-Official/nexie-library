@@ -47,3 +47,13 @@
 .task-instructions{background:#fafafa;padding:13px;margin:12px 0}
 .task-instructions p{font-size:10px;line-height:1.7;white-space:pre-wrap;color:#555}
 .development-modal .modal-actions{justify-content:space-between;gap:10px}
+
+.asset-panel{border:1px solid #e8e8e8;padding:13px;margin:12px 0}
+.asset-panel>div:first-child small{display:block;font-size:8px;letter-spacing:1px;color:#888}
+.asset-panel>div:first-child b{display:block;font-size:11px;margin:5px 0 10px}
+.asset-panel input[type=file]{font-size:10px;max-width:100%;margin:6px 0}
+.asset-list{display:grid;gap:5px;margin-top:10px}
+.asset-file{display:flex;align-items:center;gap:9px;text-align:left;background:#fff;border:1px solid #eee;padding:9px}
+.asset-file span{font-size:15px;color:#777}
+.asset-file b{font-size:9px;font-weight:500;flex:1;overflow-wrap:anywhere}
+.asset-file small{font-size:8px;color:#888;white-space:nowrap}
