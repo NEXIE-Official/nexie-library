@@ -17,7 +17,7 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return reply(405, { error: "Method not allowed" });
 
   const authHeader = req.headers.get("Authorization") ?? "";
-  const token = authHeader.replace(/^Bearer\\s+/i, "");
+  const token = authHeader.replace(/^Bearer\s+/i, "");
   if (!token || token === authHeader) return reply(401, { error: "Authentication required" });
 
   const url = Deno.env.get("SUPABASE_URL");
@@ -54,7 +54,7 @@ Deno.serve(async (req: Request) => {
 
   const allowedDomains = ["nexielibrary.com", "gatherverse.com"];
   const domain = email.split("@")[1] ?? "";
-  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || !allowedDomains.includes(domain)) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !allowedDomains.includes(domain)) {
     return reply(400, { error: "Use an authorized N·EXIE or Gatherverse work email" });
   }
   if (!fullName || !jobTitle || !department) {
