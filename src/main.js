@@ -122,7 +122,7 @@ function forcePasswordChange(){
     const button=e.submitter;button.disabled=true;
     const {error}=await supabase.auth.updateUser({password:data.password});
     if(error){$('#passwordError').textContent=error.message;button.disabled=false;return;}
-    const {error:completeError}=await supabase.rpc('complete_first_login_password_change');
+    const {error:completeError}=await supabase.from('employee_profiles').update({must_change_password:false}).eq('id',profile.id);
     if(completeError){$('#passwordError').textContent='Password changed, but the first-access confirmation failed. Please contact the administrator.';button.disabled=false;return;}
     profile={...profile,must_change_password:false};
     modal.remove();
