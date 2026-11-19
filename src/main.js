@@ -146,7 +146,7 @@ function accountDialog(){
 function forcePasswordChange(){
   const modal=document.createElement('div');
   modal.className='modal-back';
-  modal.innerHTML=`<form class="modal" id="firstPasswordForm"><div class="eyebrow">ACCOUNT SECURITY / FIRST ACCESS</div><h2>Set your personal password</h2><p>For security, you must replace the initial password before entering the workspace. Use at least 12 characters.</p><label>New password<input name="password" type="password" minlength="12" autocomplete="new-password" required></label><label>Confirm new password<input name="confirm" type="password" minlength="12" autocomplete="new-password" required></label><p id="passwordError" role="alert" style="color:#a22;min-height:18px"></p><div class="modal-actions"><button class="primary">Save new password</button></div></form>`;
+  modal.innerHTML=`<form class="modal" id="firstPasswordForm"><div class="eyebrow">ACCOUNT SECURITY / FIRST ACCESS</div><h2>Set your personal password</h2><p>For security, you must replace the initial password before entering the workspace. Use at least 12 characters.</p><label>Current initial password<input name="current_password" type="password" autocomplete="current-password" required></label><label>New password<input name="password" type="password" minlength="12" autocomplete="new-password" required></label><label>Confirm new password<input name="confirm" type="password" minlength="12" autocomplete="new-password" required></label><p id="passwordError" role="alert" style="color:#a22;min-height:18px"></p><div class="modal-actions"><button class="primary">Save new password</button></div></form>`;
   document.body.append(modal);
   $('#firstPasswordForm').onsubmit=async e=>{
     e.preventDefault();
@@ -154,7 +154,7 @@ function forcePasswordChange(){
     if(data.password.length<12){$('#passwordError').textContent='Use at least 12 characters.';return;}
     if(data.password!==data.confirm){$('#passwordError').textContent='The passwords do not match.';return;}
     const button=e.submitter;button.disabled=true;
-    const {error}=await supabase.auth.updateUser({password:data.password});
+    const {error}=await supabase.auth.updateUser({password:data.password,currentPassword:data.current_password});
     if(error){$('#passwordError').textContent=error.message;button.disabled=false;return;}
     const {error:completeError}=await supabase.from('employee_profiles').update({must_change_password:false}).eq('id',profile.id);
     if(completeError){$('#passwordError').textContent='Password changed, but the first-access confirmation failed. Please contact the administrator.';button.disabled=false;return;}
