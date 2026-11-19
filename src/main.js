@@ -125,6 +125,7 @@ function forcePasswordChange(){
     const {error:completeError}=await supabase.from('employee_profiles').update({must_change_password:false}).eq('id',profile.id);
     if(completeError){$('#passwordError').textContent='Password changed, but the first-access confirmation failed. Please contact the administrator.';button.disabled=false;return;}
     profile={...profile,must_change_password:false};
+    await loadWorkspaceData();
     modal.remove();
     render();
   };
