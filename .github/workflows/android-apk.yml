@@ -30,6 +30,20 @@ jobs:
         run: npm run build
       - name: Generate Android project
         run: npx cap add android
+      - name: Add Maven Central mirror for Android dependencies
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for name in ("android/settings.gradle", "android/build.gradle"):
+              path = Path(name)
+              if path.exists():
+                  source = path.read_text()
+                  source = source.replace(
+                      "mavenCentral()",
+                      "maven { url 'https://maven-central.storage-download.googleapis.com/maven2/' }\\n            mavenCentral()"
+                  )
+                  path.write_text(source)
+          PY
       - name: Sync Capacitor
         run: npx cap sync android
       - name: Build debug APK
