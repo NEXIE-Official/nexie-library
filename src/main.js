@@ -40,11 +40,12 @@ const artists=['Ryu Soo-min','Nyla Black','Kang Tae-oh','Han Joo-won'];
 const teams=['Creative Direction','Production','Artist Operations','Image & Styling','Performance','Brand & Marketing','Technology','People & Culture','Legal','Finance','Executive','Gatherverse'];
 const read=(k,d)=>{try{return JSON.parse(localStorage.getItem('nexie_'+k))??d}catch{return d}};
 const save=(k,v)=>localStorage.setItem('nexie_'+k,JSON.stringify(v));
-let tasks=read('tasks',[
+let tasks=read('tasks',[]);/* legacy sample task seed removed */
+/* let tasks=read('tasks',[
 {id:1,title:'Atualizar conceito visual do comeback',artist:'A.X.S.',team:'Creative Direction',assignee:'Andressa Correia',createdBy:'Andressa Correia',status:'Em andamento',priority:'Alta',due:'2026-12-05',description:'Consolidar referências e proposta visual.'},
 {id:2,title:'Revisão de styling editorial',artist:'Nyla Black',team:'Image & Styling',assignee:'Keeva Novak',createdBy:'Keeva Novak',status:'Em revisão',priority:'Média',due:'2026-11-28',description:'Validar looks e moodboard.'},
 {id:3,title:'Planejamento de conteúdo',artist:'A.X.S.',team:'Brand & Marketing',assignee:'Cho Eun-ji',createdBy:'Cho Eun-ji',status:'A fazer',priority:'Normal',due:'2026-12-02',description:'Calendário de publicação e campanha.'}
-]);
+]); */
 let messages=read('messages',[]);
 let active='overview', search='', filter='Todos', current=null, profile=null, chatOpen=false;
 const $=s=>document.querySelector(s);
