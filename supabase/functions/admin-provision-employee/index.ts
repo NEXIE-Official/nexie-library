@@ -31,15 +31,11 @@ Deno.serve(async (req: Request) => {
   const { data: authData, error: authError } = await admin.auth.getUser(token);
   if (authError || !authData.user) return reply(401, { error: "Invalid session" });
 
-  const { data: adminRecord, error: adminError } = await admin
-    .schema("private")
-    .from("system_administrators")
-    .select("user_id")
-    .eq("user_id", authData.user.id)
-    .eq("admin_level", "primary_admin")
-    .maybeSingle();
-
-  if (adminError || !adminRecord) {
+  const primaryAdminId = "3424810e-b872-43b2-98c7-803e33e671ec";
+  if (
+    authData.user.id !== primaryAdminId ||
+    (authData.user.email ?? "").toLowerCase() !== "admin@nexielibrary.com"
+  ) {
     return reply(403, { error: "Only the primary administrator can create accounts" });
   }
 
