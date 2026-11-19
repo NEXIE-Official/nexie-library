@@ -71,18 +71,6 @@ Deno.serve(async (req: Request) => {
     if (!jobTitle || !department) return reply(400, { error: "Job title and department are required" });
     const { error } = await admin.from("employee_profiles").update({ job_title: jobTitle, department }).eq("id", userId);
     if (error) return reply(500, { error: "Could not update employee role" });
-  } else if (action === "set_avatar_path") {
-    const avatarPath = String(input.avatar_path ?? "");
-    if (!avatarPath.startsWith(`employee-badges/${userId}/badge.`) ||
-        !/\\.(jpg|png|webp)$/i.test(avatarPath) ||
-        avatarPath.includes("..")) {
-      return reply(400, { error: "Invalid employee badge photo path" });
-    }
-    const { error } = await admin
-      .from("employee_profiles")
-      .update({ avatar_path: avatarPath, updated_at: new Date().toISOString() })
-      .eq("id", userId);
-    if (error) return reply(500, { error: "Could not save employee badge photo" });
   } else {
     return reply(400, { error: "Unsupported account action" });
   }
